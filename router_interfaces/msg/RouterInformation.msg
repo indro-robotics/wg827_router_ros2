@@ -20,4 +20,6 @@ string temperature
 string protocol
 string network
 string public_ip
+string is_wifi_connected
+string wifi_ssid
 

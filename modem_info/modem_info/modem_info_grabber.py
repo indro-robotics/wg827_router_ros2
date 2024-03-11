@@ -49,16 +49,28 @@ class ModemInfo(Node):
 
     def grab_modem_info(self):
         try:
-            result = self.shell.run(["cat", "/tmp/status1.file"])
-            msim = self.shell.run(["cat", "/tmp/msimdata1"])
-            public_ip = self.shell.run(["cat", "/tmp/ipip"])
+            result = self.shell.run(["cat", "/tmp/status1.file"]) # reading files
+            msim = self.shell.run(["cat", "/tmp/msimdata1"]) # reading files
+            public_ip = self.shell.run(["cat", "/tmp/ipip"]) # reading files
+            wifi = self.shell.run(["cat", "/etc/config/wireless"]) # reading files
 
         except spur.ssh.ConnectionError:
             self.get_logger().error('Connection to modem failed')
             return
-        formatted_output_list = result.output.decode("utf-8").rstrip().split('\n') 
-        msim_list = msim.output.decode("utf-8").rstrip().split('\n')
-        public_ip_list = public_ip.output.decode("utf-8").rstrip().split('"')
+        formatted_output_list = result.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
+        msim_list = msim.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
+        public_ip_list = public_ip.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
+        wifi_list = wifi.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
+
+
+        wifi_connection = wifi_list[26] 
+        print (wifi_connection)
+        is_connected = wifi_connection.find("ssid") # checking if the wifi is connected
+
+        get_wifi_ssid = wifi_connection.split('\'')
+        
+
+       
 
     
         modem_info = RouterInformation()
@@ -82,6 +94,13 @@ class ModemInfo(Node):
             modem_info.temperature=item[29]
             modem_info.protocol=item[30]
             modem_info.network=item[6]
+
+            if is_connected == 8:
+                modem_info.is_wifi_connected = "Yes"
+                modem_info.wifi_ssid = get_wifi_ssid[1]
+            else :
+                modem_info.is_wifi_connected = "No"
+            
             
 
         for msim_item in msim_list:
@@ -92,7 +111,7 @@ class ModemInfo(Node):
 
         for public_ip_info in public_ip_list:
             public_ip_info = public_ip_list
-            modem_info.public_ip=public_ip_info[3]
+            modem_info.public_ip=public_ip_info[0]
             self.modem_info_pub.publish(modem_info)
         # for item in formatted_output_list:
         #     item = item.split(':')

@@ -74,7 +74,7 @@ class ModemInfo(Node):
             modem_info.signal_power_rsrp=item[18]
             modem_info.sinr=item[32]
             modem_info.cell_info_mcc_mnc=item[11]
-            # modem_info.cell_id=item[11]
+            modem_info.cell_id=item[9]
             modem_info.cell_band_info=item[28]
             modem_info.cell_channel=item[25]
             modem_info.cell_pci=item[31]

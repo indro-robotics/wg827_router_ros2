@@ -58,7 +58,8 @@ class ModemInfo(Node):
             return
         formatted_output_list = result.output.decode("utf-8").rstrip().split('\n') 
         msim_list = msim.output.decode("utf-8").rstrip().split('\n')
-        public_ip_list = public_ip.output.decode("utf-8").rstrip().split(':')
+        public_ip_list = public_ip.output.decode("utf-8").rstrip().split('"')
+
     
         modem_info = RouterInformation()
         modem_info.header.stamp = self.now.to_msg()
@@ -91,7 +92,7 @@ class ModemInfo(Node):
 
         for public_ip_info in public_ip_list:
             public_ip_info = public_ip_list
-            modem_info.public_ip=public_ip_info[1]
+            modem_info.public_ip=public_ip_info[3]
             self.modem_info_pub.publish(modem_info)
         # for item in formatted_output_list:
         #     item = item.split(':')

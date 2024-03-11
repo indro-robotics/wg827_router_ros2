@@ -64,7 +64,6 @@ class ModemInfo(Node):
 
 
         wifi_connection = wifi_list[26] 
-        print (wifi_connection)
         is_connected = wifi_connection.find("ssid") # checking if the wifi is connected
 
         get_wifi_ssid = wifi_connection.split('\'')

@@ -1,0 +1,22 @@
+std_msgs/Header header
+string device_model
+string sim_imsi
+string modem_port
+string csq
+string rssi
+string signal_quality_rsrq
+string signal_power_rsrp
+string sinr
+string cell_info_mcc_mnc
+string cell_id
+string cell_band_info
+string cell_channel
+string cell_pci
+string imei
+string iccid
+string signal_strength
+string provider
+string temperature
+string protocol
+string network
+

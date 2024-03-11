@@ -19,4 +19,5 @@ string provider
 string temperature
 string protocol
 string network
+string public_ip
 

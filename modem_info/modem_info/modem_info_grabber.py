@@ -53,12 +53,16 @@ class ModemInfo(Node):
         try:
             result = self.shell.run(["cat", "/tmp/status1.file"])
             msim = self.shell.run(["cat", "/tmp/msimdata1"])
+            public_ip = self.shell.run(["cat", "/tmp/ipip"])
 
         except spur.ssh.ConnectionError:
             self.get_logger().error('Connection to modem failed')
             return
         formatted_output_list = result.output.decode("utf-8").rstrip().split('\n') 
         msim_list = msim.output.decode("utf-8").rstrip().split('\n')
+        public_ip_list = public_ip.output.decode("utf-8").rstrip().split(':')
+
+        print (public_ip_list)
         
         modem_info = RouterInformation()
         modem_info.header.stamp = self.now.to_msg()
@@ -81,14 +85,18 @@ class ModemInfo(Node):
             modem_info.temperature=item[29]
             modem_info.protocol=item[30]
             modem_info.network=item[6]
+            
 
         for msim_item in msim_list:
             msim_item = msim_list
             modem_info.sim_imsi=msim_item[2]
             modem_info.imei=msim_item[1]
             modem_info.iccid=msim_item[3]
+
+        for public_ip_info in public_ip_list:
+            public_ip_info = public_ip_list
+            modem_info.public_ip=public_ip_info[1]
             self.modem_info_pub.publish(modem_info)
-            
         # for item in formatted_output_list:
         #     item = item.split(':')
         #     if item[0].find('device_model') != -1:

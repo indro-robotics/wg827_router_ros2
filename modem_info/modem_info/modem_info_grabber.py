@@ -9,9 +9,7 @@ import rclpy
 from rclpy.node import Node
 import spur
 
-#from interfaces.msg import ModemInfoMSG
 from router_interfaces.msg import RouterInformation
-# from sensor_msgs.msg import NavSatFix
 
 class ModemInfo(Node):
     def __init__(self):

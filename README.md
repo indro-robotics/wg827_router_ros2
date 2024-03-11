@@ -1,6 +1,6 @@
 # wg827_router_ros2
 
-This package allows to obtain modem information and publish it to `/modem/modem_info` ROS2 topic.
+This package allows to obtain modem information and publish it to `/router/modem_info` ROS2 topic.
 
 # install
 

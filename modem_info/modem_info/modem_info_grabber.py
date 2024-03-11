@@ -27,6 +27,7 @@ class ModemInfo(Node):
         )
         self.get_logger().info('Modem Info Grabber Initialized')
         self.get_logger().info('Testing connection to modem...')
+        
 
         try:
             result = self.shell.run(["ls", "-l"])
@@ -34,7 +35,7 @@ class ModemInfo(Node):
             self.get_logger().error('Connection to modem failed')
             exit()
 
-        self.modem_info_pub = self.create_publisher(RouterInformation, '/modem/modem_info', 10)
+        self.modem_info_pub = self.create_publisher(RouterInformation, '/router/modem_info', 10)
         self.get_logger().info('Connected...')
         # Publish at 1 Hz
         self.timer = self.create_timer(1, self.timer_callback)

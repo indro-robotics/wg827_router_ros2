@@ -63,7 +63,7 @@ class ModemInfo(Node):
         wifi_list = wifi.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
 
 
-        wifi_connection = wifi_list[26] 
+        wifi_connection = wifi_list[25] 
         is_connected = wifi_connection.find("ssid") # checking if the wifi is connected
 
         get_wifi_ssid = wifi_connection.split('\'')

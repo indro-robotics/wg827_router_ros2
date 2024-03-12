@@ -63,14 +63,19 @@ class ModemInfo(Node):
         wifi_list = wifi.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
 
 
-        wifi_connection = wifi_list[25] 
+        is_cell_density_present = wifi_list[12].find("cell_density")
+
+# checking if the cell_density line is present in the file as it changes the file
+        if is_cell_density_present == 8:
+            line = 26
+        else :
+            line = 25
+
+        wifi_connection = wifi_list[line] 
         is_connected = wifi_connection.find("ssid") # checking if the wifi is connected
         get_wifi_ssid = wifi_connection.split('\'')
-        
 
        
-
-    
         modem_info = RouterInformation()
         modem_info.header.stamp = self.now.to_msg()
         for item in formatted_output_list:

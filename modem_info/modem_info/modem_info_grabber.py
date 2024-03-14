@@ -53,7 +53,7 @@ class ModemInfo(Node):
             msim = self.shell.run(["cat", "/tmp/msimdata1"]) # reading files
             public_ip = self.shell.run(["cat", "/tmp/ipip"]) # reading files
             wifi = self.shell.run(["cat", "/etc/config/wireless"]) # reading files
-
+            wifi_signal = self.shell.run(["cat", "/tmp/ssidlist"]) # reading files
         except spur.ssh.ConnectionError:
             self.get_logger().error('Connection to modem failed')
             return
@@ -61,7 +61,9 @@ class ModemInfo(Node):
         msim_list = msim.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
         public_ip_list = public_ip.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
         wifi_list = wifi.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
+        wifi_signal_list = wifi_signal.output.decode("utf-8")
 
+        
 
         is_cell_density_present = wifi_list[12].find("cell_density")
 
@@ -74,6 +76,12 @@ class ModemInfo(Node):
         wifi_connection = wifi_list[line] 
         is_connected = wifi_connection.find("ssid") # checking if the wifi is connected
         get_wifi_ssid = wifi_connection.split('\'')
+        
+        connected_ssid = get_wifi_ssid[1]
+
+        splitted_wifi_signal_list = wifi_signal_list.split("Cell")[1:]
+
+
 
        
         modem_info = RouterInformation()
@@ -98,24 +106,41 @@ class ModemInfo(Node):
             modem_info.protocol=item[30]
             modem_info.network=item[6]
 
+
             if is_connected == 8:
                 modem_info.is_wifi_connected = "Yes"
                 modem_info.wifi_ssid = get_wifi_ssid[1]
             else:
                 modem_info.is_wifi_connected = "No"
-            
-            
 
+        for record in splitted_wifi_signal_list:
+            if connected_ssid in record:
+                lines = record.split("\n")
+
+                for line in lines:
+                    if "Quality:" in line:
+                        quality_value = line.split(":")[2].strip()
+                        if quality_value is not None:
+                            numerator, denominator = map(int, quality_value.split("/"))
+                            quality = (numerator / denominator) * 100 
+                            quality_percentage = str(quality) + "%"
+                    
+                            modem_info.wifi_quality = quality_percentage 
+
+        
         for msim_item in msim_list:
             msim_item = msim_list
             modem_info.sim_imsi=msim_item[2]
             modem_info.imei=msim_item[1]
             modem_info.iccid=msim_item[3]
 
+
         for public_ip_info in public_ip_list:
             public_ip_info = public_ip_list
             modem_info.public_ip=public_ip_info[0]
             self.modem_info_pub.publish(modem_info)
+        
+
         # for item in formatted_output_list:
         #     item = item.split(':')
         #     if item[0].find('device_model') != -1:

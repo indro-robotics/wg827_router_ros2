@@ -53,7 +53,7 @@ class ModemInfo(Node):
             msim = self.shell.run(["cat", "/tmp/msimdata1"]) # reading files
             public_ip = self.shell.run(["cat", "/tmp/ipip"]) # reading files
             wifi = self.shell.run(["cat", "/etc/config/wireless"]) # reading files
-            wifi_signal = self.shell.run(["cat", "/tmp/ssidlist"]) # reading files
+            
         except spur.ssh.ConnectionError:
             self.get_logger().error('Connection to modem failed')
             return
@@ -61,7 +61,6 @@ class ModemInfo(Node):
         msim_list = msim.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
         public_ip_list = public_ip.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
         wifi_list = wifi.output.decode("utf-8").rstrip().split('\n') # decoding, splitting and saving them as arrays
-        wifi_signal_list = wifi_signal.output.decode("utf-8")
 
         
 
@@ -79,7 +78,6 @@ class ModemInfo(Node):
         
         connected_ssid = get_wifi_ssid[1]
 
-        splitted_wifi_signal_list = wifi_signal_list.split("Cell")[1:]
 
 
 
@@ -107,25 +105,29 @@ class ModemInfo(Node):
             modem_info.network=item[6]
 
 
-            if is_connected == 8:
-                modem_info.is_wifi_connected = "Yes"
-                modem_info.wifi_ssid = get_wifi_ssid[1]
-            else:
-                modem_info.is_wifi_connected = "No"
+        if is_connected == 8:
+            modem_info.is_wifi_connected = "Yes"
+            modem_info.wifi_ssid = get_wifi_ssid[1]
+            wifi_signal = self.shell.run(["cat", "/tmp/ssidlist"]) # reading files
+            wifi_signal_list = wifi_signal.output.decode("utf-8")
+            splitted_wifi_signal_list = wifi_signal_list.split("Cell")[1:]
 
-        for record in splitted_wifi_signal_list:
-            if connected_ssid in record:
-                lines = record.split("\n")
+            for record in splitted_wifi_signal_list:
+                if connected_ssid in record:
+                    lines = record.split("\n")
 
-                for line in lines:
-                    if "Quality:" in line:
-                        quality_value = line.split(":")[2].strip()
-                        if quality_value is not None:
-                            numerator, denominator = map(int, quality_value.split("/"))
-                            quality = (numerator / denominator) * 100 
-                            quality_percentage = str(quality) + "%"
-                    
-                            modem_info.wifi_quality = quality_percentage 
+                    for line in lines:
+                        if "Quality:" in line:
+                            quality_value = line.split(":")[2].strip()
+                            if quality_value is not None:
+                                numerator, denominator = map(int, quality_value.split("/"))
+                                quality = (numerator / denominator) * 100 
+                                quality_percentage = str(quality) + "%"
+                        
+                                modem_info.wifi_quality = quality_percentage 
+        else:
+            modem_info.is_wifi_connected = "No"
+            modem_info.wifi_quality = "0%"
 
         
         for msim_item in msim_list:
